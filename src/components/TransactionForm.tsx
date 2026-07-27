@@ -55,6 +55,7 @@ export function TransactionForm({
 
   const needsDestination = type === "transfer" || type === "atm_withdrawal";
   const sourceAccount = accounts.find((a) => a.id === accountId);
+  const destinationAccounts = accounts.filter((a) => a.id !== accountId);
   const sourceBalance = useMemo(
     () =>
       sourceAccount
@@ -152,20 +153,34 @@ export function TransactionForm({
         {needsDestination ? (
           <div className="grid gap-2">
             <Label>To account</Label>
-            <Select value={toAccountId} onValueChange={setToAccountId}>
+            <Select
+              value={toAccountId}
+              onValueChange={setToAccountId}
+              disabled={destinationAccounts.length === 0}
+            >
               <SelectTrigger>
-                <SelectValue placeholder="Choose destination" />
+                <SelectValue
+                  placeholder={
+                    destinationAccounts.length === 0
+                      ? "No other account yet"
+                      : "Choose destination"
+                  }
+                />
               </SelectTrigger>
               <SelectContent>
-                {accounts
-                  .filter((a) => a.id !== accountId)
-                  .map((a) => (
-                    <SelectItem key={a.id} value={a.id}>
-                      {a.account_name}
-                    </SelectItem>
-                  ))}
+                {destinationAccounts.map((a) => (
+                  <SelectItem key={a.id} value={a.id}>
+                    {a.account_name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
+            {destinationAccounts.length === 0 ? (
+              <p className="text-xs text-muted-foreground">
+                You need a second account (for example a “Cash” account) to receive this money.
+                Create one on the Accounts page first.
+              </p>
+            ) : null}
           </div>
         ) : null}
 
