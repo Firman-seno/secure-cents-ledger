@@ -179,3 +179,19 @@ export function useDeleteTransaction() {
     onSuccess: invalidate,
   });
 }
+
+export function useSaveProfile() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { full_name?: string; currency?: string; allow_overdraft?: boolean }) => {
+      const { data: auth } = await supabase.auth.getUser();
+      if (!auth.user) throw new Error("You must be signed in.");
+      const { error } = await supabase
+        .from("profiles")
+        .update(input as never)
+        .eq("id", auth.user.id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["profile"] }),
+  });
+}
