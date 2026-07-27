@@ -79,7 +79,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Ledgerly — Personal Finance Tracker" },
+      { title: "Kelola — Personal Finance Tracker" },
       {
         name: "description",
         content:
