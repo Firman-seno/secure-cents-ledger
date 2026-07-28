@@ -23,12 +23,36 @@ export const Route = createFileRoute("/")({
 });
 
 const FEATURES = [
-  { icon: Wallet, title: "Multiple accounts", body: "Bank, cash, e-wallet and more — each with its own live balance." },
-  { icon: Banknote, title: "ATM withdrawals done right", body: "Money moves from bank to cash. Only the fee counts as a cost." },
-  { icon: ArrowLeftRight, title: "Transfers", body: "Move money between your own accounts without skewing income or expense." },
-  { icon: LineChart, title: "Balance on any date", body: "Rewind to any day and see exactly what each account held." },
-  { icon: PieChart, title: "Reports", body: "Income vs expense, category breakdown and balance over time." },
-  { icon: ShieldCheck, title: "Private by design", body: "Row-level security means your data is only ever visible to you." },
+  {
+    icon: Wallet,
+    title: "Multiple accounts",
+    body: "Bank, cash, e-wallet and more — each with its own live balance.",
+  },
+  {
+    icon: Banknote,
+    title: "ATM withdrawals done right",
+    body: "Money moves from bank to cash. Only the fee counts as a cost.",
+  },
+  {
+    icon: ArrowLeftRight,
+    title: "Transfers",
+    body: "Move money between your own accounts without skewing income or expense.",
+  },
+  {
+    icon: LineChart,
+    title: "Balance on any date",
+    body: "Rewind to any day and see exactly what each account held.",
+  },
+  {
+    icon: PieChart,
+    title: "Reports",
+    body: "Income vs expense, category breakdown and balance over time.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Private by design",
+    body: "Row-level security means your data is only ever visible to you.",
+  },
 ];
 
 function Landing() {
