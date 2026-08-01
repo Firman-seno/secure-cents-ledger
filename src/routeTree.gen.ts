@@ -22,6 +22,7 @@ import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedIncomeRouteImport } from './routes/_authenticated/income'
 import { Route as AuthenticatedExpensesRouteImport } from './routes/_authenticated/expenses'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedBackupHistoryRouteImport } from './routes/_authenticated/backup-history'
 import { Route as AuthenticatedAtmRouteImport } from './routes/_authenticated/atm'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAccountsRouteImport } from './routes/_authenticated/accounts'
@@ -91,6 +92,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedBackupHistoryRoute =
+  AuthenticatedBackupHistoryRouteImport.update({
+    id: '/backup-history',
+    path: '/backup-history',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAtmRoute = AuthenticatedAtmRouteImport.update({
   id: '/atm',
   path: '/atm',
@@ -115,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/accounts': typeof AuthenticatedAccountsRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/atm': typeof AuthenticatedAtmRoute
+  '/backup-history': typeof AuthenticatedBackupHistoryRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/expenses': typeof AuthenticatedExpensesRoute
   '/income': typeof AuthenticatedIncomeRoute
@@ -132,6 +140,7 @@ export interface FileRoutesByTo {
   '/accounts': typeof AuthenticatedAccountsRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/atm': typeof AuthenticatedAtmRoute
+  '/backup-history': typeof AuthenticatedBackupHistoryRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/expenses': typeof AuthenticatedExpensesRoute
   '/income': typeof AuthenticatedIncomeRoute
@@ -151,6 +160,7 @@ export interface FileRoutesById {
   '/_authenticated/accounts': typeof AuthenticatedAccountsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/atm': typeof AuthenticatedAtmRoute
+  '/_authenticated/backup-history': typeof AuthenticatedBackupHistoryRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/expenses': typeof AuthenticatedExpensesRoute
   '/_authenticated/income': typeof AuthenticatedIncomeRoute
@@ -170,6 +180,7 @@ export interface FileRouteTypes {
     | '/accounts'
     | '/admin'
     | '/atm'
+    | '/backup-history'
     | '/dashboard'
     | '/expenses'
     | '/income'
@@ -187,6 +198,7 @@ export interface FileRouteTypes {
     | '/accounts'
     | '/admin'
     | '/atm'
+    | '/backup-history'
     | '/dashboard'
     | '/expenses'
     | '/income'
@@ -205,6 +217,7 @@ export interface FileRouteTypes {
     | '/_authenticated/accounts'
     | '/_authenticated/admin'
     | '/_authenticated/atm'
+    | '/_authenticated/backup-history'
     | '/_authenticated/dashboard'
     | '/_authenticated/expenses'
     | '/_authenticated/income'
@@ -316,6 +329,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/backup-history': {
+      id: '/_authenticated/backup-history'
+      path: '/backup-history'
+      fullPath: '/backup-history'
+      preLoaderRoute: typeof AuthenticatedBackupHistoryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/atm': {
       id: '/_authenticated/atm'
       path: '/atm'
@@ -344,6 +364,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAccountsRoute: typeof AuthenticatedAccountsRoute
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedAtmRoute: typeof AuthenticatedAtmRoute
+  AuthenticatedBackupHistoryRoute: typeof AuthenticatedBackupHistoryRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedExpensesRoute: typeof AuthenticatedExpensesRoute
   AuthenticatedIncomeRoute: typeof AuthenticatedIncomeRoute
@@ -358,6 +379,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAccountsRoute: AuthenticatedAccountsRoute,
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedAtmRoute: AuthenticatedAtmRoute,
+  AuthenticatedBackupHistoryRoute: AuthenticatedBackupHistoryRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedExpensesRoute: AuthenticatedExpensesRoute,
   AuthenticatedIncomeRoute: AuthenticatedIncomeRoute,
