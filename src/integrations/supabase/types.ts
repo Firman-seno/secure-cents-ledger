@@ -47,6 +47,105 @@ export type Database = {
         }
         Relationships: []
       }
+      backup_history: {
+        Row: {
+          created_at: string
+          duration_ms: number
+          error_message: string | null
+          id: string
+          range_from: string | null
+          range_to: string | null
+          row_count: number
+          scope: string
+          skipped_count: number
+          started_at: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          duration_ms?: number
+          error_message?: string | null
+          id?: string
+          range_from?: string | null
+          range_to?: string | null
+          row_count?: number
+          scope?: string
+          skipped_count?: number
+          started_at?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          duration_ms?: number
+          error_message?: string | null
+          id?: string
+          range_from?: string | null
+          range_to?: string | null
+          row_count?: number
+          scope?: string
+          skipped_count?: number
+          started_at?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      backup_records: {
+        Row: {
+          backed_up_at: string
+          id: string
+          transaction_id: string
+          user_id: string
+        }
+        Insert: {
+          backed_up_at?: string
+          id?: string
+          transaction_id: string
+          user_id: string
+        }
+        Update: {
+          backed_up_at?: string
+          id?: string
+          transaction_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      backup_settings: {
+        Row: {
+          auto_backup: boolean
+          created_at: string
+          entry_map: Json
+          form_action_url: string
+          form_url: string
+          skip_duplicates: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          auto_backup?: boolean
+          created_at?: string
+          entry_map?: Json
+          form_action_url?: string
+          form_url?: string
+          skip_duplicates?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          auto_backup?: boolean
+          created_at?: string
+          entry_map?: Json
+          form_action_url?: string
+          form_url?: string
+          skip_duplicates?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           allow_overdraft: boolean
