@@ -11,6 +11,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { TransactionTable } from "@/components/TransactionTable";
+import { BackupButton } from "@/components/BackupDialog";
+
 import { useAccounts, useProfile, useTransactions } from "@/lib/queries";
 import { EXPENSE_CATEGORIES, INCOME_SOURCES, TYPE_LABEL, inRange } from "@/lib/finance";
 
@@ -64,7 +66,9 @@ function TransactionsPage() {
       <PageHeader
         title="Transaction history"
         description={`${filtered.length} of ${transactions.length} transactions`}
+        action={<BackupButton filteredTransactions={filtered} />}
       />
+
 
       <div className="surface-card mb-6 grid gap-4 p-5 md:grid-cols-3 xl:grid-cols-4">
         <div className="grid gap-2">
