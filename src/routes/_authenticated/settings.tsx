@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/select";
 import { useAccounts, useProfile, useSaveProfile, useTransactions } from "@/lib/queries";
 import { TYPE_LABEL } from "@/lib/finance";
+import { BackupSettingsCard } from "@/components/BackupSettingsCard";
+
 
 export const Route = createFileRoute("/_authenticated/settings")({
   component: SettingsPage,
@@ -84,8 +86,9 @@ function SettingsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl">
+    <div className="mx-auto grid max-w-2xl gap-6">
       <PageHeader title="Settings" description="Preferences for how the app behaves." />
+
 
       <div className="surface-card grid gap-6 p-6">
         <div className="grid gap-2">
@@ -140,6 +143,9 @@ function SettingsPage() {
           </Button>
         </div>
       </div>
+
+      <BackupSettingsCard />
     </div>
+
   );
 }

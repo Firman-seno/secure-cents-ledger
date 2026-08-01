@@ -13,6 +13,8 @@ import {
   User,
   Settings,
   Shield,
+  FileSpreadsheet,
+
   LogOut,
   Menu,
   X,
