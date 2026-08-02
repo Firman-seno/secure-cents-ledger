@@ -74,6 +74,33 @@ export function useBackupHistory() {
   });
 }
 
+export function useDeleteBackupHistory() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("backup_history").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["backup-history"] }),
+  });
+}
+
+export function useClearBackupHistory() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      const { data: auth } = await supabase.auth.getUser();
+      if (!auth.user) throw new Error("You must be signed in.");
+      const { error } = await supabase
+        .from("backup_history")
+        .delete()
+        .eq("user_id", auth.user.id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["backup-history"] }),
+  });
+}
+
 export function useBackedUpIds() {
   return useQuery({
     queryKey: ["backup-records"],
