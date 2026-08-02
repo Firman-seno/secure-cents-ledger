@@ -1,9 +1,16 @@
 import { supabase } from "@/integrations/supabase/client";
-import { submitBackupChunk } from "@/lib/backup.functions";
-import { buildBackupRows, type BackupSettings, type EntryMap } from "@/lib/backup";
+import { submitBackupChunk, submitSheetChunk } from "@/lib/backup.functions";
+import {
+  SHEET_HEADERS,
+  buildBackupRows,
+  rowToSheetRecord,
+  type BackupSettings,
+  type EntryMap,
+} from "@/lib/backup";
 import type { Account, Transaction } from "@/lib/finance";
 
 const CHUNK = 10;
+const SHEET_CHUNK = 100;
 
 export function mapRowToEntries(
   row: Record<string, string>,
