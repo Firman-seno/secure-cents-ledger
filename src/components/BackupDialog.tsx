@@ -126,13 +126,13 @@ export function BackupButton({
         <DialogHeader>
           <DialogTitle>Backup to Google Sheets</DialogTitle>
           <DialogDescription>
-            Transactions are sent to your Google Form, which stores them in the linked spreadsheet.
+            Transactions are written straight into your connected Google Spreadsheet.
           </DialogDescription>
         </DialogHeader>
 
         {!configured ? (
           <p className="rounded-lg border border-border bg-muted/40 p-3 text-sm text-muted-foreground">
-            Set your Google Form action URL and entry IDs in <strong>Settings</strong> first.
+            Connect your spreadsheet in <strong>Settings</strong> first.
           </p>
         ) : (
           <div className="grid gap-4">
