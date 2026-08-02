@@ -1,9 +1,16 @@
 import { supabase } from "@/integrations/supabase/client";
-import { submitBackupChunk } from "@/lib/backup.functions";
-import { buildBackupRows, type BackupSettings, type EntryMap } from "@/lib/backup";
+import { submitBackupChunk, submitSheetChunk } from "@/lib/backup.functions";
+import {
+  SHEET_HEADERS,
+  buildBackupRows,
+  rowToSheetRecord,
+  type BackupSettings,
+  type EntryMap,
+} from "@/lib/backup";
 import type { Account, Transaction } from "@/lib/finance";
 
 const CHUNK = 10;
+const SHEET_CHUNK = 100;
 
 export function mapRowToEntries(
   row: Record<string, string>,
@@ -49,9 +56,13 @@ export async function runBackup({
   to = null,
   onProgress,
 }: RunBackupInput): Promise<RunBackupResult> {
-  if (!settings.form_action_url) throw new Error("Google Form action URL is not configured yet.");
-  if (Object.values(settings.entry_map ?? {}).filter(Boolean).length === 0)
-    throw new Error("No Google Form entry IDs configured yet.");
+  const useSheet = !!settings.web_app_url;
+  if (!useSheet) {
+    if (!settings.form_action_url)
+      throw new Error("Connect your spreadsheet in Settings first (Apps Script web app URL).");
+    if (Object.values(settings.entry_map ?? {}).filter(Boolean).length === 0)
+      throw new Error("No Google Form entry IDs configured yet.");
+  }
 
   const started = Date.now();
   const pending = skipIds ? transactions.filter((t) => !skipIds.has(t.id)) : transactions;
@@ -65,21 +76,33 @@ export async function runBackup({
   const rows = buildBackupRows(pending, allTransactions, accounts, createdBy);
   let sent = 0;
   let failed = 0;
+  let lastError: string | null = null;
   const sentIds: string[] = [];
 
   try {
-    for (let i = 0; i < rows.length; i += CHUNK) {
-      const slice = rows.slice(i, i + CHUNK);
-      const result = await submitBackupChunk({
-        data: {
-          actionUrl: settings.form_action_url,
-          rows: slice.map((r) => mapRowToEntries(r, settings.entry_map ?? {})),
-        },
-      });
+    const step = useSheet ? SHEET_CHUNK : CHUNK;
+    for (let i = 0; i < rows.length; i += step) {
+      const slice = rows.slice(i, i + step);
+      const result = useSheet
+        ? await submitSheetChunk({
+            data: {
+              webAppUrl: settings.web_app_url,
+              sheetName: settings.sheet_name || "Transactions",
+              headers: SHEET_HEADERS,
+              rows: slice.map(rowToSheetRecord),
+            },
+          })
+        : await submitBackupChunk({
+            data: {
+              actionUrl: settings.form_action_url,
+              rows: slice.map((r) => mapRowToEntries(r, settings.entry_map ?? {})),
+            },
+          });
       sent += result.sent;
       failed += result.failed;
+      if ("error" in result && result.error) lastError = result.error;
       if (result.sent > 0) sentIds.push(...slice.slice(0, result.sent).map((r) => r.transaction_id));
-      onProgress?.(Math.round(Math.min(i + CHUNK, rows.length) * (100 / rows.length)));
+      onProgress?.(Math.round(Math.min(i + step, rows.length) * (100 / rows.length)));
     }
   } catch (err) {
     await writeHistory({
@@ -113,7 +136,7 @@ export async function runBackup({
     skipped,
     status: failed > 0 ? "failed" : "success",
     duration: Date.now() - started,
-    error: failed > 0 ? `${failed} row(s) were rejected by Google Forms.` : null,
+    error: failed > 0 ? (lastError ?? `${failed} row(s) were rejected.`) : null,
   });
 
   return { sent, skipped, failed };

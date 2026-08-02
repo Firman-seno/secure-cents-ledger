@@ -19,6 +19,9 @@ const EMPTY: Omit<BackupSettings, "user_id"> = {
   form_url: "",
   form_action_url: "",
   entry_map: {},
+  spreadsheet_url: "",
+  web_app_url: "",
+  sheet_name: "Transactions",
   auto_backup: false,
   skip_duplicates: true,
 };

@@ -1,7 +1,8 @@
-/** Server-only helper that posts rows to a Google Form. */
+/** Server-only helpers that push rows to the user's Google destination. */
 export interface FormSubmitResult {
   sent: number;
   failed: number;
+  error?: string;
 }
 
 export function assertGoogleFormUrl(url: string) {
@@ -27,7 +28,6 @@ export function assertGoogleFormUrl(url: string) {
     );
   }
 
-  // Accept a pasted /viewform (or edit) link and normalise it to the submit endpoint.
   if (isDocs && !parsed.pathname.endsWith("/formResponse")) {
     parsed.pathname = parsed.pathname
       .replace(/\/(viewform|edit|prefill)\/?$/, "/formResponse")
@@ -37,6 +37,71 @@ export function assertGoogleFormUrl(url: string) {
   }
 
   return parsed.toString();
+}
+
+/** Apps Script web app URL: https://script.google.com/macros/s/XXXX/exec */
+export function assertWebAppUrl(url: string) {
+  let parsed: URL;
+  try {
+    parsed = new URL((url ?? "").trim());
+  } catch {
+    throw new Error("Apps Script URL is not a valid URL. Paste the full https:// link.");
+  }
+  const host = parsed.hostname.toLowerCase();
+  const allowed =
+    host === "script.google.com" ||
+    host.endsWith(".googleusercontent.com") ||
+    host === "script.googleusercontent.com";
+  if (parsed.protocol !== "https:" || !allowed) {
+    throw new Error(
+      "Apps Script URL must look like https://script.google.com/macros/s/XXXX/exec",
+    );
+  }
+  return parsed.toString();
+}
+
+export async function postRowsToWebApp(
+  webAppUrl: string,
+  sheetName: string,
+  headers: string[],
+  rows: Record<string, string>[],
+): Promise<FormSubmitResult> {
+  const url = assertWebAppUrl(webAppUrl);
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ sheet: sheetName || "Transactions", headers, rows }),
+      redirect: "follow",
+    });
+    const text = await res.text();
+    if (!res.ok) {
+      return { sent: 0, failed: rows.length, error: `Apps Script replied ${res.status}: ${text.slice(0, 200)}` };
+    }
+    let payload: { ok?: boolean; inserted?: number; error?: string } = {};
+    try {
+      payload = JSON.parse(text) as typeof payload;
+    } catch {
+      // Apps Script may return HTML when the deployment is not public.
+      return {
+        sent: 0,
+        failed: rows.length,
+        error:
+          "Apps Script did not return JSON. Re-deploy the script with access set to \"Anyone\".",
+      };
+    }
+    if (payload.ok === false) {
+      return { sent: 0, failed: rows.length, error: payload.error ?? "Apps Script rejected the rows." };
+    }
+    const inserted = typeof payload.inserted === "number" ? payload.inserted : rows.length;
+    return { sent: inserted, failed: rows.length - inserted };
+  } catch (err) {
+    return {
+      sent: 0,
+      failed: rows.length,
+      error: err instanceof Error ? err.message : "Could not reach the Apps Script web app.",
+    };
+  }
 }
 
 export async function postRowsToForm(
@@ -60,7 +125,6 @@ export async function postRowsToForm(
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
           body: body.toString(),
         });
-        // Google Forms answers 200 on success and 4xx when the form rejects input.
         return res.ok;
       } catch {
         return false;

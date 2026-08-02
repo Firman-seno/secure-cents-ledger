@@ -120,9 +120,12 @@ export type Database = {
           entry_map: Json
           form_action_url: string
           form_url: string
+          sheet_name: string
           skip_duplicates: boolean
+          spreadsheet_url: string
           updated_at: string
           user_id: string
+          web_app_url: string
         }
         Insert: {
           auto_backup?: boolean
@@ -130,9 +133,12 @@ export type Database = {
           entry_map?: Json
           form_action_url?: string
           form_url?: string
+          sheet_name?: string
           skip_duplicates?: boolean
+          spreadsheet_url?: string
           updated_at?: string
           user_id: string
+          web_app_url?: string
         }
         Update: {
           auto_backup?: boolean
@@ -140,9 +146,12 @@ export type Database = {
           entry_map?: Json
           form_action_url?: string
           form_url?: string
+          sheet_name?: string
           skip_duplicates?: boolean
+          spreadsheet_url?: string
           updated_at?: string
           user_id?: string
+          web_app_url?: string
         }
         Relationships: []
       }
