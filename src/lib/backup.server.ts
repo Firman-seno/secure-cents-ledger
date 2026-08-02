@@ -7,16 +7,35 @@ export interface FormSubmitResult {
 export function assertGoogleFormUrl(url: string) {
   let parsed: URL;
   try {
-    parsed = new URL(url);
+    parsed = new URL((url ?? "").trim());
   } catch {
-    throw new Error("Google Form action URL is not a valid URL.");
+    throw new Error(
+      "Google Form action URL is not a valid URL. Copy it from your form and paste the full https:// link.",
+    );
   }
-  if (parsed.protocol !== "https:" || parsed.hostname !== "docs.google.com") {
-    throw new Error("Action URL must be an https docs.google.com Google Form URL.");
+  if (parsed.protocol !== "https:") {
+    throw new Error("Google Form action URL must start with https://");
   }
-  if (!parsed.pathname.includes("/forms/")) {
-    throw new Error("Action URL must point to a Google Form (/forms/.../formResponse).");
+
+  const host = parsed.hostname.toLowerCase();
+  const isDocs = host === "docs.google.com" && parsed.pathname.includes("/forms/");
+  const isShortLink = host === "forms.gle" || host === "forms.app.goo.gl";
+
+  if (!isDocs && !isShortLink) {
+    throw new Error(
+      "Action URL must be a Google Form link, e.g. https://docs.google.com/forms/d/e/XXXX/formResponse",
+    );
   }
+
+  // Accept a pasted /viewform (or edit) link and normalise it to the submit endpoint.
+  if (isDocs && !parsed.pathname.endsWith("/formResponse")) {
+    parsed.pathname = parsed.pathname
+      .replace(/\/(viewform|edit|prefill)\/?$/, "/formResponse")
+      .replace(/\/$/, "");
+    if (!parsed.pathname.endsWith("/formResponse")) parsed.pathname += "/formResponse";
+    parsed.search = "";
+  }
+
   return parsed.toString();
 }
 
