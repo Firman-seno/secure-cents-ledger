@@ -136,7 +136,7 @@ export async function runBackup({
     skipped,
     status: failed > 0 ? "failed" : "success",
     duration: Date.now() - started,
-    error: failed > 0 ? `${failed} row(s) were rejected by Google Forms.` : null,
+    error: failed > 0 ? (lastError ?? `${failed} row(s) were rejected.`) : null,
   });
 
   return { sent, skipped, failed };
