@@ -50,13 +50,45 @@ const SCOPE_LABEL: Record<string, string> = {
 
 function BackupHistoryPage() {
   const { data: history = [], isLoading } = useBackupHistory();
+  const remove = useDeleteBackupHistory();
+  const clear = useClearBackupHistory();
+
+  async function removeOne(id: string) {
+    try {
+      await remove.mutateAsync(id);
+      toast.success("Backup record deleted.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not delete this record.");
+    }
+  }
+
+  async function clearAll() {
+    if (!window.confirm("Delete all backup history? Your spreadsheet data stays untouched.")) return;
+    try {
+      await clear.mutateAsync();
+      toast.success("Backup history cleared.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not clear the history.");
+    }
+  }
 
   return (
     <div>
       <PageHeader
         title="Backup history"
         description="Every backup sent to your Google Spreadsheet."
-        action={<BackupButton />}
+        action={
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              onClick={clearAll}
+              disabled={history.length === 0 || clear.isPending}
+            >
+              <Trash2 className="size-4" /> Clear all
+            </Button>
+            <BackupButton />
+          </div>
+        }
       />
 
       <div className="surface-card overflow-x-auto">
@@ -68,6 +100,7 @@ function BackupHistoryPage() {
               <TableHead>Range</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Duration</TableHead>
+              <TableHead className="w-12" />
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -94,11 +127,22 @@ function BackupHistoryPage() {
                   ) : null}
                 </TableCell>
                 <TableCell className="text-right">{(h.duration_ms / 1000).toFixed(1)}s</TableCell>
+                <TableCell className="text-right">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Delete backup record"
+                    onClick={() => removeOne(h.id)}
+                    disabled={remove.isPending}
+                  >
+                    <Trash2 className="size-4 text-destructive" />
+                  </Button>
+                </TableCell>
               </TableRow>
             ))}
             {history.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="py-10 text-center text-muted-foreground">
+                <TableCell colSpan={6} className="py-10 text-center text-muted-foreground">
                   {isLoading ? "Loading…" : "No backups yet."}
                 </TableCell>
               </TableRow>
