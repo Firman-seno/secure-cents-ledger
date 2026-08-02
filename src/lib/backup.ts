@@ -28,8 +28,21 @@ export interface BackupSettings {
   form_url: string;
   form_action_url: string;
   entry_map: EntryMap;
+  spreadsheet_url: string;
+  web_app_url: string;
+  sheet_name: string;
   auto_backup: boolean;
   skip_duplicates: boolean;
+}
+
+/** Column headers written to the user's spreadsheet, in order. */
+export const SHEET_HEADERS = BACKUP_FIELDS.map((f) => f.label);
+
+/** Turn a mapped row into the spreadsheet column order (labels as keys). */
+export function rowToSheetRecord(row: Record<string, string>) {
+  const out: Record<string, string> = {};
+  for (const field of BACKUP_FIELDS) out[field.label] = row[field.key] ?? "";
+  return out;
 }
 
 const MONTHS = [
