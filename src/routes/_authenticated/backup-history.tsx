@@ -1,7 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { toast } from "sonner";
+import { Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/AppShell";
 import { BackupButton } from "@/components/BackupDialog";
-import { useBackupHistory } from "@/lib/backup-queries";
+import {
+  useBackupHistory,
+  useClearBackupHistory,
+  useDeleteBackupHistory,
+} from "@/lib/backup-queries";
 import {
   Table,
   TableBody,
@@ -11,6 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/backup-history")({
   component: BackupHistoryPage,
