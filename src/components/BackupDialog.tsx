@@ -74,8 +74,9 @@ export function BackupButton({
     : selection.length;
 
   const configured =
-    !!settings?.form_action_url &&
-    Object.values(settings?.entry_map ?? {}).filter(Boolean).length > 0;
+    !!settings?.web_app_url ||
+    (!!settings?.form_action_url &&
+      Object.values(settings?.entry_map ?? {}).filter(Boolean).length > 0);
 
   async function start() {
     if (!settings) return;
