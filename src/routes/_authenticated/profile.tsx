@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/ui/password-input";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile, useSaveProfile } from "@/lib/queries";
 
@@ -67,9 +68,8 @@ function ProfilePage() {
         <h2 className="font-semibold">Change password</h2>
         <div className="grid gap-2">
           <Label htmlFor="new-pass">New password</Label>
-          <Input
+          <PasswordInput
             id="new-pass"
-            type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="new-password"
@@ -77,9 +77,8 @@ function ProfilePage() {
         </div>
         <div className="grid gap-2">
           <Label htmlFor="confirm-pass">Confirm new password</Label>
-          <Input
+          <PasswordInput
             id="confirm-pass"
-            type="password"
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
             autoComplete="new-password"

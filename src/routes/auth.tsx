@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { Wallet } from "lucide-react";
+import { Mail, Wallet } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { friendlyAuthError } from "@/lib/auth-errors";
 
@@ -95,10 +96,9 @@ function AuthPage() {
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="login-password">Password</Label>
-                  <Input
+                  <PasswordInput
                     id="login-password"
                     name="password"
-                    type="password"
                     required
                     autoComplete="current-password"
                   />
@@ -127,10 +127,9 @@ function AuthPage() {
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="reg-password">Password</Label>
-                  <Input
+                  <PasswordInput
                     id="reg-password"
                     name="password"
-                    type="password"
                     required
                     minLength={8}
                     autoComplete="new-password"

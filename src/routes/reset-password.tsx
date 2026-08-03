@@ -4,8 +4,8 @@ import { toast } from "sonner";
 import { KeyRound, ShieldCheck, Wallet } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/ui/password-input";
 import { friendlyAuthError } from "@/lib/auth-errors";
 
 export const Route = createFileRoute("/reset-password")({
@@ -262,9 +262,8 @@ function ResetPasswordPage() {
               <form onSubmit={handleSubmit} className="grid gap-4" noValidate>
                 <div className="grid gap-2">
                   <Label htmlFor="password">New password</Label>
-                  <Input
+                  <PasswordInput
                     id="password"
-                    type="password"
                     value={password}
                     onChange={(e) => {
                       setPassword(e.target.value);
@@ -283,9 +282,8 @@ function ResetPasswordPage() {
 
                 <div className="grid gap-2">
                   <Label htmlFor="confirm">Confirm new password</Label>
-                  <Input
+                  <PasswordInput
                     id="confirm"
-                    type="password"
                     value={confirm}
                     onChange={(e) => {
                       setConfirm(e.target.value);
