@@ -12,6 +12,9 @@ import {
 } from "@/components/ui/select";
 import { TransactionTable } from "@/components/TransactionTable";
 import { BackupButton } from "@/components/BackupDialog";
+import { Button } from "@/components/ui/button";
+import { Download, FileSpreadsheet, Printer } from "lucide-react";
+import { buildExportRows, exportRowsCsv, exportRowsExcel } from "@/lib/data-export";
 
 import { useAccounts, useProfile, useTransactions } from "@/lib/queries";
 import { EXPENSE_CATEGORIES, INCOME_SOURCES, TYPE_LABEL, inRange } from "@/lib/finance";
@@ -66,7 +69,7 @@ function TransactionsPage() {
       <PageHeader
         title="Transaction history"
         description={`${filtered.length} of ${transactions.length} transactions`}
-        action={<BackupButton filteredTransactions={filtered} />}
+        action={<div className="flex flex-wrap gap-2"><Button variant="outline" onClick={() => exportRowsCsv(buildExportRows(filtered, accounts))} disabled={!filtered.length}><Download className="size-4" /> CSV</Button><Button variant="outline" onClick={() => exportRowsExcel(buildExportRows(filtered, accounts))} disabled={!filtered.length}><FileSpreadsheet className="size-4" /> Excel</Button><Button variant="outline" onClick={() => window.print()}><Printer className="size-4" /> Print</Button><BackupButton filteredTransactions={filtered} /></div>}
       />
 
 

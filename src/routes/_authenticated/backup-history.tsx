@@ -1,12 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { Trash2 } from "lucide-react";
+import { RotateCcw, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/AppShell";
 import { BackupButton } from "@/components/BackupDialog";
 import {
   useBackupHistory,
   useClearBackupHistory,
   useDeleteBackupHistory,
+  useBackupEvents,
+  useRestoreBackupEvent,
 } from "@/lib/backup-queries";
 import {
   Table,
@@ -26,12 +28,12 @@ export const Route = createFileRoute("/_authenticated/backup-history")({
       { title: "Backup History — Kelola" },
       {
         name: "description",
-        content: "Review every Google Sheets backup: date, row count, range, status and duration.",
+        content: "Review automatic database backups and restore previous Kelola data versions.",
       },
       { property: "og:title", content: "Backup History — Kelola" },
       {
         property: "og:description",
-        content: "Review every Google Sheets backup run from your Kelola finance app.",
+        content: "Review automatic database backup activity in Kelola.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -52,6 +54,8 @@ function BackupHistoryPage() {
   const { data: history = [], isLoading } = useBackupHistory();
   const remove = useDeleteBackupHistory();
   const clear = useClearBackupHistory();
+  const { data: events = [] } = useBackupEvents();
+  const restore = useRestoreBackupEvent();
 
   async function removeOne(id: string) {
     try {
@@ -63,7 +67,7 @@ function BackupHistoryPage() {
   }
 
   async function clearAll() {
-    if (!window.confirm("Delete all backup history? Your spreadsheet data stays untouched.")) return;
+    if (!window.confirm("Delete all backup history entries? Saved data versions remain available.")) return;
     try {
       await clear.mutateAsync();
       toast.success("Backup history cleared.");
@@ -76,7 +80,7 @@ function BackupHistoryPage() {
     <div>
       <PageHeader
         title="Backup history"
-        description="Every backup sent to your Google Spreadsheet."
+        description="Automatic database audit, snapshots, and restore points."
         action={
           <div className="flex flex-wrap gap-2">
             <Button
@@ -147,6 +151,27 @@ function BackupHistoryPage() {
                 </TableCell>
               </TableRow>
             ) : null}
+          </TableBody>
+        </Table>
+      </div>
+      <div className="mt-6 surface-card overflow-x-auto">
+        <div className="border-b border-border p-5">
+          <h2 className="font-semibold">Data versions</h2>
+          <p className="mt-1 text-sm text-muted-foreground">Latest 250 protected versions from accounts, transactions, profile, and settings.</p>
+        </div>
+        <Table>
+          <TableHeader><TableRow><TableHead>Date</TableHead><TableHead>Table</TableHead><TableHead>Action</TableHead><TableHead>Record</TableHead><TableHead className="text-right">Restore</TableHead></TableRow></TableHeader>
+          <TableBody>
+            {events.map((event) => (
+              <TableRow key={event.id}>
+                <TableCell className="whitespace-nowrap">{new Date(event.created_at).toLocaleString()}</TableCell>
+                <TableCell>{event.entity_type}</TableCell>
+                <TableCell><Badge variant="secondary">{event.operation}</Badge></TableCell>
+                <TableCell className="font-mono text-xs">{event.record_id.slice(0, 8)}…</TableCell>
+                <TableCell className="text-right"><Button variant="ghost" size="icon" disabled={restore.isPending} aria-label="Restore this version" onClick={async () => { if (!window.confirm("Restore this data version?")) return; try { await restore.mutateAsync(event.id); toast.success("Data version restored."); } catch (err) { toast.error(err instanceof Error ? err.message : "Restore failed."); } }}><RotateCcw className="size-4" /></Button></TableCell>
+              </TableRow>
+            ))}
+            {events.length === 0 ? <TableRow><TableCell colSpan={5} className="py-8 text-center text-muted-foreground">No data versions yet.</TableCell></TableRow> : null}
           </TableBody>
         </Table>
       </div>
