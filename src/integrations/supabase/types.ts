@@ -17,42 +17,110 @@ export type Database = {
       accounts: {
         Row: {
           account_name: string
+          account_number: string | null
           account_type: Database["public"]["Enums"]["account_type"]
+          bank_name: string | null
           created_at: string
+          currency: string
+          current_balance: number | null
           id: string
           initial_balance: number
           is_demo: boolean
+          opening_balance: number
+          status: string
           updated_at: string
           user_id: string
         }
         Insert: {
           account_name: string
+          account_number?: string | null
           account_type?: Database["public"]["Enums"]["account_type"]
+          bank_name?: string | null
           created_at?: string
+          currency?: string
+          current_balance?: number | null
           id?: string
           initial_balance?: number
           is_demo?: boolean
+          opening_balance?: number
+          status?: string
           updated_at?: string
           user_id: string
         }
         Update: {
           account_name?: string
+          account_number?: string | null
           account_type?: Database["public"]["Enums"]["account_type"]
+          bank_name?: string | null
           created_at?: string
+          currency?: string
+          current_balance?: number | null
           id?: string
           initial_balance?: number
           is_demo?: boolean
+          opening_balance?: number
+          status?: string
           updated_at?: string
           user_id?: string
         }
         Relationships: []
       }
+      backup_events: {
+        Row: {
+          after_data: Json | null
+          backup_batch_id: string | null
+          before_data: Json | null
+          created_at: string
+          entity_type: string
+          id: string
+          operation: string
+          record_id: string
+          restored_at: string | null
+          user_id: string
+        }
+        Insert: {
+          after_data?: Json | null
+          backup_batch_id?: string | null
+          before_data?: Json | null
+          created_at?: string
+          entity_type: string
+          id?: string
+          operation: string
+          record_id: string
+          restored_at?: string | null
+          user_id: string
+        }
+        Update: {
+          after_data?: Json | null
+          backup_batch_id?: string | null
+          before_data?: Json | null
+          created_at?: string
+          entity_type?: string
+          id?: string
+          operation?: string
+          record_id?: string
+          restored_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "backup_events_backup_batch_id_fkey"
+            columns: ["backup_batch_id"]
+            isOneToOne: false
+            referencedRelation: "backup_history"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       backup_history: {
         Row: {
+          backup_status: string
+          backup_type: string
           created_at: string
           duration_ms: number
           error_message: string | null
           id: string
+          notes: string | null
           range_from: string | null
           range_to: string | null
           row_count: number
@@ -60,13 +128,17 @@ export type Database = {
           skipped_count: number
           started_at: string
           status: string
+          storage_location: string
           user_id: string
         }
         Insert: {
+          backup_status?: string
+          backup_type?: string
           created_at?: string
           duration_ms?: number
           error_message?: string | null
           id?: string
+          notes?: string | null
           range_from?: string | null
           range_to?: string | null
           row_count?: number
@@ -74,13 +146,17 @@ export type Database = {
           skipped_count?: number
           started_at?: string
           status?: string
+          storage_location?: string
           user_id: string
         }
         Update: {
+          backup_status?: string
+          backup_type?: string
           created_at?: string
           duration_ms?: number
           error_message?: string | null
           id?: string
+          notes?: string | null
           range_from?: string | null
           range_to?: string | null
           row_count?: number
@@ -88,6 +164,7 @@ export type Database = {
           skipped_count?: number
           started_at?: string
           status?: string
+          storage_location?: string
           user_id?: string
         }
         Relationships: []
@@ -157,30 +234,39 @@ export type Database = {
       }
       profiles: {
         Row: {
+          address: string | null
           allow_overdraft: boolean
           created_at: string
           currency: string
           email: string
           full_name: string
           id: string
+          phone: string | null
+          profile_photo: string | null
           updated_at: string
         }
         Insert: {
+          address?: string | null
           allow_overdraft?: boolean
           created_at?: string
           currency?: string
           email?: string
           full_name?: string
           id: string
+          phone?: string | null
+          profile_photo?: string | null
           updated_at?: string
         }
         Update: {
+          address?: string | null
           allow_overdraft?: boolean
           created_at?: string
           currency?: string
           email?: string
           full_name?: string
           id?: string
+          phone?: string | null
+          profile_photo?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -189,6 +275,8 @@ export type Database = {
         Row: {
           account_id: string
           amount: number
+          attachment: string | null
+          balance_after: number | null
           category: string | null
           created_at: string
           description: string | null
@@ -197,6 +285,8 @@ export type Database = {
           is_demo: boolean
           payment_method: string | null
           receipt_url: string | null
+          reference_number: string | null
+          status: string
           to_account_id: string | null
           transaction_date: string
           transaction_type: Database["public"]["Enums"]["transaction_type"]
@@ -206,6 +296,8 @@ export type Database = {
         Insert: {
           account_id: string
           amount: number
+          attachment?: string | null
+          balance_after?: number | null
           category?: string | null
           created_at?: string
           description?: string | null
@@ -214,6 +306,8 @@ export type Database = {
           is_demo?: boolean
           payment_method?: string | null
           receipt_url?: string | null
+          reference_number?: string | null
+          status?: string
           to_account_id?: string | null
           transaction_date: string
           transaction_type: Database["public"]["Enums"]["transaction_type"]
@@ -223,6 +317,8 @@ export type Database = {
         Update: {
           account_id?: string
           amount?: number
+          attachment?: string | null
+          balance_after?: number | null
           category?: string | null
           created_at?: string
           description?: string | null
@@ -231,6 +327,8 @@ export type Database = {
           is_demo?: boolean
           payment_method?: string | null
           receipt_url?: string | null
+          reference_number?: string | null
+          status?: string
           to_account_id?: string | null
           transaction_date?: string
           transaction_type?: Database["public"]["Enums"]["transaction_type"]
@@ -291,6 +389,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      create_full_backup: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -298,6 +397,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      restore_backup_event: { Args: { _event_id: string }; Returns: undefined }
     }
     Enums: {
       account_type: "bank" | "cash" | "ewallet" | "other"
