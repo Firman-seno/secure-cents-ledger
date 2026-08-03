@@ -88,6 +88,7 @@ export async function runBackup({
             data: {
               webAppUrl: settings.web_app_url,
               sheetName: settings.sheet_name || "Transactions",
+              spreadsheetUrl: settings.spreadsheet_url ?? "",
               headers: SHEET_HEADERS,
               rows: slice.map(rowToSheetRecord),
             },
