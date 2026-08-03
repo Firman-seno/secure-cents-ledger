@@ -13,6 +13,21 @@ export interface BackupHistoryRow {
   status: string;
   duration_ms: number;
   error_message: string | null;
+  backup_type: string;
+  backup_status: string;
+  storage_location: string;
+  notes: string | null;
+}
+
+export interface BackupEventRow {
+  id: string;
+  entity_type: string;
+  operation: string;
+  record_id: string;
+  created_at: string;
+  restored_at: string | null;
+  before_data: Record<string, unknown> | null;
+  after_data: Record<string, unknown> | null;
 }
 
 const EMPTY: Omit<BackupSettings, "user_id"> = {
@@ -111,6 +126,53 @@ export function useBackedUpIds() {
       const { data, error } = await supabase.from("backup_records").select("transaction_id");
       if (error) throw error;
       return new Set((data ?? []).map((r) => (r as { transaction_id: string }).transaction_id));
+    },
+  });
+}
+
+export function useBackupEvents() {
+  return useQuery({
+    queryKey: ["backup-events"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("backup_events")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(250);
+      if (error) throw error;
+      return (data ?? []) as unknown as BackupEventRow[];
+    },
+  });
+}
+
+export function useCreateFullBackup() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.rpc("create_full_backup");
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["backup-history"] });
+      qc.invalidateQueries({ queryKey: ["backup-events"] });
+    },
+  });
+}
+
+export function useRestoreBackupEvent() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (eventId: string) => {
+      const { error } = await supabase.rpc("restore_backup_event", { _event_id: eventId });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["backup-history"] });
+      qc.invalidateQueries({ queryKey: ["backup-events"] });
+      qc.invalidateQueries({ queryKey: ["accounts"] });
+      qc.invalidateQueries({ queryKey: ["transactions"] });
+      qc.invalidateQueries({ queryKey: ["profile"] });
     },
   });
 }

@@ -7,6 +7,12 @@ export interface Account {
   account_name: string;
   account_type: AccountType;
   initial_balance: number;
+  account_number?: string | null;
+  bank_name?: string | null;
+  currency?: string;
+  opening_balance?: number;
+  current_balance?: number | null;
+  status?: string;
   is_demo: boolean;
   created_at: string;
 }
@@ -24,6 +30,10 @@ export interface Transaction {
   description: string | null;
   payment_method: string | null;
   receipt_url: string | null;
+  reference_number?: string | null;
+  status?: string;
+  balance_after?: number | null;
+  attachment?: string | null;
   is_demo: boolean;
   created_at: string;
 }

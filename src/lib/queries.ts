@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Account, Transaction } from "@/lib/finance";
-import type { BackupSettings } from "@/lib/backup";
 
 
 export function useProfile() {
@@ -168,47 +167,11 @@ export function useSaveTransaction() {
         .select("*")
         .maybeSingle();
       if (error) throw error;
-      if (inserted) await maybeAutoBackup(inserted as unknown as Transaction);
+      return inserted as unknown as Transaction | null;
     },
     onSuccess: invalidate,
   });
 }
-
-/** Fire-and-forget auto backup of a freshly created transaction. */
-async function maybeAutoBackup(tx: Transaction) {
-  try {
-    const { data: auth } = await supabase.auth.getUser();
-    if (!auth.user) return;
-    const { data: settings } = await supabase
-      .from("backup_settings")
-      .select("*")
-      .eq("user_id", auth.user.id)
-      .maybeSingle();
-    const s = settings as unknown as BackupSettings | null;
-    if (!s?.auto_backup || !s.form_action_url) return;
-
-    const [{ data: accounts }, { data: all }, { data: profile }] = await Promise.all([
-      supabase.from("accounts").select("*"),
-      supabase.from("transactions").select("*"),
-      supabase.from("profiles").select("email").eq("id", auth.user.id).maybeSingle(),
-    ]);
-
-    const { runBackup } = await import("@/lib/backup-run");
-    await runBackup({
-      settings: { ...s, entry_map: s.entry_map ?? {} },
-      transactions: [tx],
-      allTransactions: (all ?? []) as unknown as Transaction[],
-      accounts: (accounts ?? []) as unknown as Account[],
-      createdBy: (profile as { email?: string } | null)?.email ?? "",
-      scope: "auto",
-      from: tx.transaction_date,
-      to: tx.transaction_date,
-    });
-  } catch (err) {
-    console.error("Auto backup failed", err);
-  }
-}
-
 
 export function useDeleteTransaction() {
   const invalidate = useInvalidateFinance();
