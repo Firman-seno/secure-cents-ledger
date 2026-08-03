@@ -65,13 +65,19 @@ export async function postRowsToWebApp(
   sheetName: string,
   headers: string[],
   rows: Record<string, string>[],
+  spreadsheetUrl?: string,
 ): Promise<FormSubmitResult> {
   const url = assertWebAppUrl(webAppUrl);
   try {
     const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ sheet: sheetName || "Transactions", headers, rows }),
+      body: JSON.stringify({
+        sheet: sheetName || "Transactions",
+        spreadsheetUrl: spreadsheetUrl ?? "",
+        headers,
+        rows,
+      }),
       redirect: "follow",
     });
     const text = await res.text();
