@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { friendlyAuthError } from "@/lib/auth-errors";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -42,7 +43,7 @@ function AuthPage() {
       password: String(form.get("password")),
     });
     setLoading(false);
-    if (error) return toast.error(error.message);
+    if (error) return toast.error(friendlyAuthError(error, "Sign in failed. Please check your email and password."));
     toast.success("Welcome back!");
     navigate({ to: "/dashboard" });
   }
@@ -53,7 +54,7 @@ function AuthPage() {
     const fullName = String(form.get("full_name")).trim();
     const password = String(form.get("password"));
     if (fullName.length < 2) return toast.error("Please enter your full name.");
-    if (password.length < 6) return toast.error("Password must be at least 6 characters.");
+    if (password.length < 8) return toast.error("Password must be at least 8 characters.");
     setLoading(true);
     const { error } = await supabase.auth.signUp({
       email: String(form.get("email")).trim(),
@@ -64,22 +65,8 @@ function AuthPage() {
       },
     });
     setLoading(false);
-    if (error) return toast.error(error.message);
+    if (error) return toast.error(friendlyAuthError(error, "We couldn't create your account. Please try again."));
     toast.success("Account created. You can sign in now.");
-    setMode("login");
-  }
-
-  async function handleForgot(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const form = new FormData(e.currentTarget);
-    setLoading(true);
-    const { error } = await supabase.auth.resetPasswordForEmail(
-      String(form.get("email")).trim(),
-      { redirectTo: `${window.location.origin}/reset-password` },
-    );
-    setLoading(false);
-    if (error) return toast.error(error.message);
-    toast.success("Password reset link sent. Check your inbox.");
     setMode("login");
   }
 
@@ -119,13 +106,12 @@ function AuthPage() {
                 <Button type="submit" disabled={loading}>
                   {loading ? "Signing in…" : "Sign in"}
                 </Button>
-                <button
-                  type="button"
-                  className="text-sm text-muted-foreground underline-offset-4 hover:underline"
-                  onClick={() => setMode("forgot")}
+                <Link
+                  to="/forgot-password"
+                  className="text-center text-sm text-muted-foreground underline-offset-4 hover:underline"
                 >
                   Forgot password?
-                </button>
+                </Link>
               </form>
             </TabsContent>
 
@@ -146,35 +132,13 @@ function AuthPage() {
                     name="password"
                     type="password"
                     required
-                    minLength={6}
+                    minLength={8}
                     autoComplete="new-password"
                   />
                 </div>
                 <Button type="submit" disabled={loading}>
                   {loading ? "Creating account…" : "Create account"}
                 </Button>
-              </form>
-            </TabsContent>
-
-            <TabsContent value="forgot" className="mt-6">
-              <form onSubmit={handleForgot} className="grid gap-4">
-                <p className="text-sm text-muted-foreground">
-                  Enter your email and we&apos;ll send you a reset link.
-                </p>
-                <div className="grid gap-2">
-                  <Label htmlFor="forgot-email">Email</Label>
-                  <Input id="forgot-email" name="email" type="email" required />
-                </div>
-                <Button type="submit" disabled={loading}>
-                  {loading ? "Sending…" : "Send reset link"}
-                </Button>
-                <button
-                  type="button"
-                  className="text-sm text-muted-foreground underline-offset-4 hover:underline"
-                  onClick={() => setMode("login")}
-                >
-                  Back to sign in
-                </button>
               </form>
             </TabsContent>
           </Tabs>
