@@ -8,26 +8,35 @@ import { Switch } from "@/components/ui/switch";
 import { BACKUP_FIELDS } from "@/lib/backup";
 import { useBackupSettings, useSaveBackupSettings } from "@/lib/backup-queries";
 import { BackupButton } from "@/components/BackupDialog";
+import { testSheetConnection } from "@/lib/backup.functions";
 
 const APPS_SCRIPT = `function doPost(e) {
-  var body = JSON.parse(e.postData.contents);
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var name = body.sheet || 'Transactions';
-  var sheet = ss.getSheetByName(name) || ss.insertSheet(name);
-  if (sheet.getLastRow() === 0) {
-    sheet.appendRow(body.headers);
-    sheet.getRange(1, 1, 1, body.headers.length).setFontWeight('bold');
-    sheet.setFrozenRows(1);
+  try {
+    var body = JSON.parse(e.postData.contents);
+    var ss = body.spreadsheetUrl
+      ? SpreadsheetApp.openByUrl(body.spreadsheetUrl)
+      : SpreadsheetApp.getActiveSpreadsheet();
+    var name = body.sheet || 'Transactions';
+    var sheet = ss.getSheetByName(name) || ss.insertSheet(name);
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow(body.headers);
+      sheet.getRange(1, 1, 1, body.headers.length).setFontWeight('bold');
+      sheet.setFrozenRows(1);
+    }
+    var rows = body.rows.map(function (r) {
+      return body.headers.map(function (h) { return r[h] || ''; });
+    });
+    if (rows.length) {
+      sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, body.headers.length).setValues(rows);
+    }
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: true, inserted: rows.length }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: false, error: String(err) }))
+      .setMimeType(ContentService.MimeType.JSON);
   }
-  var rows = body.rows.map(function (r) {
-    return body.headers.map(function (h) { return r[h] || ''; });
-  });
-  if (rows.length) {
-    sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, body.headers.length).setValues(rows);
-  }
-  return ContentService
-    .createTextOutput(JSON.stringify({ ok: true, inserted: rows.length }))
-    .setMimeType(ContentService.MimeType.JSON);
 }`;
 
 export function BackupSettingsCard() {
@@ -38,6 +47,7 @@ export function BackupSettingsCard() {
   const [webAppUrl, setWebAppUrl] = useState("");
   const [sheetName, setSheetName] = useState("Transactions");
   const [autoBackup, setAutoBackup] = useState(false);
+  const [testing, setTesting] = useState(false);
 
   useEffect(() => {
     if (!settings) return;
@@ -62,6 +72,37 @@ export function BackupSettingsCard() {
       toast.success("Script copied. Paste it into Apps Script.");
     } catch {
       toast.error("Could not copy. Select the script and copy it manually.");
+    }
+  }
+
+  async function testConnection() {
+    if (!webAppUrl.trim()) {
+      toast.error("Paste your Apps Script web app URL first.");
+      return;
+    }
+    setTesting(true);
+    try {
+      await save.mutateAsync({
+        web_app_url: webAppUrl,
+        spreadsheet_url: spreadsheetUrl,
+        sheet_name: sheetName || "Transactions",
+      });
+      const result = await testSheetConnection({
+        data: {
+          webAppUrl,
+          sheetName: sheetName || "Transactions",
+          spreadsheetUrl,
+        },
+      });
+      if (result.sent > 0) {
+        toast.success("Connected. A test row was written to your sheet — delete it if you like.");
+      } else {
+        toast.error(result.error ?? "The script did not accept the test row.");
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Connection test failed.");
+    } finally {
+      setTesting(false);
     }
   }
 
@@ -142,6 +183,15 @@ export function BackupSettingsCard() {
             placeholder="Transactions"
           />
         </div>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-3">
+        <Button variant="outline" onClick={testConnection} disabled={testing}>
+          {testing ? "Testing…" : "Test connection"}
+        </Button>
+        <span className="text-xs text-muted-foreground">
+          Writes one test row so you can confirm the link works.
+        </span>
       </div>
 
       <p className={`text-sm ${connected ? "text-primary" : "text-muted-foreground"}`}>

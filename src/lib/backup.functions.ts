@@ -21,6 +21,7 @@ export const submitSheetChunk = createServerFn({ method: "POST" })
     (input: {
       webAppUrl: string;
       sheetName: string;
+      spreadsheetUrl?: string;
       headers: string[];
       rows: Record<string, string>[];
     }) => {
@@ -33,5 +34,29 @@ export const submitSheetChunk = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     const { postRowsToWebApp } = await import("@/lib/backup.server");
-    return postRowsToWebApp(data.webAppUrl, data.sheetName, data.headers, data.rows);
+    return postRowsToWebApp(
+      data.webAppUrl,
+      data.sheetName,
+      data.headers,
+      data.rows,
+      data.spreadsheetUrl,
+    );
+  });
+
+export const testSheetConnection = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { webAppUrl: string; sheetName: string; spreadsheetUrl?: string }) => {
+    if (!input?.webAppUrl) throw new Error("Paste your Apps Script web app URL first.");
+    return input;
+  })
+  .handler(async ({ data }) => {
+    const { postRowsToWebApp } = await import("@/lib/backup.server");
+    const headers = ["Transaction ID", "Note"];
+    return postRowsToWebApp(
+      data.webAppUrl,
+      data.sheetName || "Transactions",
+      headers,
+      [{ "Transaction ID": "TEST", Note: `Connection test ${new Date().toISOString()}` }],
+      data.spreadsheetUrl,
+    );
   });
