@@ -13,8 +13,6 @@ import {
   User,
   Settings,
   Shield,
-  FileSpreadsheet,
-
   LogOut,
   Menu,
   X,
@@ -34,7 +32,6 @@ const NAV = [
   { to: "/transactions", label: "Transactions", icon: ListOrdered },
   { to: "/reports", label: "Reports", icon: PieChart },
   { to: "/profile", label: "Profile", icon: User },
-  { to: "/backup-history", label: "Backup History", icon: FileSpreadsheet },
   { to: "/settings", label: "Settings", icon: Settings },
 ] as const;
 

@@ -15,8 +15,6 @@ import {
 } from "@/components/ui/select";
 import { useAccounts, useProfile, useSaveProfile, useTransactions } from "@/lib/queries";
 import { TYPE_LABEL } from "@/lib/finance";
-import { BackupSettingsCard } from "@/components/BackupSettingsCard";
-
 
 export const Route = createFileRoute("/_authenticated/settings")({
   component: SettingsPage,
@@ -143,9 +141,6 @@ function SettingsPage() {
           </Button>
         </div>
       </div>
-
-      <BackupSettingsCard />
     </div>
-
   );
 }
