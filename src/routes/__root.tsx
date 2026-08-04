@@ -123,14 +123,8 @@ function RootComponent() {
 
   useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") {
-        // The reset email may land on any page (e.g. the root) when its redirect
-        // URL isn't whitelisted in Supabase. Route the user to the reset page.
-        if (window.location.pathname !== "/reset-password") {
-          router.navigate({ to: "/reset-password" });
-        }
-        return;
-      }
+      if (event === "PASSWORD_RECOVERY") return;
+
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       router.invalidate();
       if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
