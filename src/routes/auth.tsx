@@ -54,7 +54,11 @@ function AuthPage() {
     const form = new FormData(e.currentTarget);
     const fullName = String(form.get("full_name")).trim();
     const password = String(form.get("password"));
+    const phone = String(form.get("phone") ?? "").trim();
     if (fullName.length < 2) return toast.error("Please enter your full name.");
+    if (!isValidIndonesianPhone(phone)) {
+      return toast.error("Please enter a valid Indonesian WhatsApp number (e.g. 08123456789).");
+    }
     if (password.length < 8) return toast.error("Password must be at least 8 characters.");
     setLoading(true);
     const { error } = await supabase.auth.signUp({
@@ -62,7 +66,7 @@ function AuthPage() {
       password,
       options: {
         emailRedirectTo: window.location.origin,
-        data: { full_name: fullName },
+        data: { full_name: fullName, phone: normalizePhone(phone) },
       },
     });
     setLoading(false);
@@ -70,6 +74,7 @@ function AuthPage() {
     toast.success("Account created. You can sign in now.");
     setMode("login");
   }
+
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
