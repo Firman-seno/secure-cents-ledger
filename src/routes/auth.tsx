@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { friendlyAuthError } from "@/lib/auth-errors";
+import { isValidIndonesianPhone, normalizePhone } from "@/lib/phone";
+
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
