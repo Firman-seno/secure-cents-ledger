@@ -26,6 +26,9 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAtmRouteImport } from './routes/_authenticated/atm'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAccountsRouteImport } from './routes/_authenticated/accounts'
+import { Route as ApiPublicAuthVerifyOtpRouteImport } from './routes/api/public/auth/verify-otp'
+import { Route as ApiPublicAuthResetPasswordRouteImport } from './routes/api/public/auth/reset-password'
+import { Route as ApiPublicAuthForgotPasswordRouteImport } from './routes/api/public/auth/forgot-password'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -112,6 +115,23 @@ const AuthenticatedAccountsRoute = AuthenticatedAccountsRouteImport.update({
   path: '/accounts',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicAuthVerifyOtpRoute = ApiPublicAuthVerifyOtpRouteImport.update({
+  id: '/api/public/auth/verify-otp',
+  path: '/api/public/auth/verify-otp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicAuthResetPasswordRoute =
+  ApiPublicAuthResetPasswordRouteImport.update({
+    id: '/api/public/auth/reset-password',
+    path: '/api/public/auth/reset-password',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicAuthForgotPasswordRoute =
+  ApiPublicAuthForgotPasswordRouteImport.update({
+    id: '/api/public/auth/forgot-password',
+    path: '/api/public/auth/forgot-password',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -130,6 +150,9 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/transactions': typeof AuthenticatedTransactionsRoute
   '/transfers': typeof AuthenticatedTransfersRoute
+  '/api/public/auth/forgot-password': typeof ApiPublicAuthForgotPasswordRoute
+  '/api/public/auth/reset-password': typeof ApiPublicAuthResetPasswordRoute
+  '/api/public/auth/verify-otp': typeof ApiPublicAuthVerifyOtpRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -148,6 +171,9 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/transactions': typeof AuthenticatedTransactionsRoute
   '/transfers': typeof AuthenticatedTransfersRoute
+  '/api/public/auth/forgot-password': typeof ApiPublicAuthForgotPasswordRoute
+  '/api/public/auth/reset-password': typeof ApiPublicAuthResetPasswordRoute
+  '/api/public/auth/verify-otp': typeof ApiPublicAuthVerifyOtpRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -168,6 +194,9 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/transactions': typeof AuthenticatedTransactionsRoute
   '/_authenticated/transfers': typeof AuthenticatedTransfersRoute
+  '/api/public/auth/forgot-password': typeof ApiPublicAuthForgotPasswordRoute
+  '/api/public/auth/reset-password': typeof ApiPublicAuthResetPasswordRoute
+  '/api/public/auth/verify-otp': typeof ApiPublicAuthVerifyOtpRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -188,6 +217,9 @@ export interface FileRouteTypes {
     | '/settings'
     | '/transactions'
     | '/transfers'
+    | '/api/public/auth/forgot-password'
+    | '/api/public/auth/reset-password'
+    | '/api/public/auth/verify-otp'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -206,6 +238,9 @@ export interface FileRouteTypes {
     | '/settings'
     | '/transactions'
     | '/transfers'
+    | '/api/public/auth/forgot-password'
+    | '/api/public/auth/reset-password'
+    | '/api/public/auth/verify-otp'
   id:
     | '__root__'
     | '/'
@@ -225,6 +260,9 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/transactions'
     | '/_authenticated/transfers'
+    | '/api/public/auth/forgot-password'
+    | '/api/public/auth/reset-password'
+    | '/api/public/auth/verify-otp'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -234,6 +272,9 @@ export interface RootRouteChildren {
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ApiPublicAuthForgotPasswordRoute: typeof ApiPublicAuthForgotPasswordRoute
+  ApiPublicAuthResetPasswordRoute: typeof ApiPublicAuthResetPasswordRoute
+  ApiPublicAuthVerifyOtpRoute: typeof ApiPublicAuthVerifyOtpRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -357,6 +398,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAccountsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/auth/verify-otp': {
+      id: '/api/public/auth/verify-otp'
+      path: '/api/public/auth/verify-otp'
+      fullPath: '/api/public/auth/verify-otp'
+      preLoaderRoute: typeof ApiPublicAuthVerifyOtpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/auth/reset-password': {
+      id: '/api/public/auth/reset-password'
+      path: '/api/public/auth/reset-password'
+      fullPath: '/api/public/auth/reset-password'
+      preLoaderRoute: typeof ApiPublicAuthResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/auth/forgot-password': {
+      id: '/api/public/auth/forgot-password'
+      path: '/api/public/auth/forgot-password'
+      fullPath: '/api/public/auth/forgot-password'
+      preLoaderRoute: typeof ApiPublicAuthForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -398,17 +460,10 @@ const rootRouteChildren: RootRouteChildren = {
   ForgotPasswordRoute: ForgotPasswordRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ApiPublicAuthForgotPasswordRoute: ApiPublicAuthForgotPasswordRoute,
+  ApiPublicAuthResetPasswordRoute: ApiPublicAuthResetPasswordRoute,
+  ApiPublicAuthVerifyOtpRoute: ApiPublicAuthVerifyOtpRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
