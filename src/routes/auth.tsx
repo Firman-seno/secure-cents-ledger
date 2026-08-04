@@ -133,6 +133,21 @@ function AuthPage() {
                   <Input id="reg-email" name="email" type="email" required autoComplete="email" />
                 </div>
                 <div className="grid gap-2">
+                  <Label htmlFor="reg-phone">WhatsApp number</Label>
+                  <Input
+                    id="reg-phone"
+                    name="phone"
+                    inputMode="tel"
+                    required
+                    autoComplete="tel"
+                    placeholder="08xxxxxxxxxx"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Used to reset your password via WhatsApp OTP.
+                  </p>
+                </div>
+
+                <div className="grid gap-2">
                   <Label htmlFor="reg-password">Password</Label>
                   <PasswordInput
                     id="reg-password"
