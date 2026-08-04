@@ -65,6 +65,173 @@ export type Database = {
         }
         Relationships: []
       }
+      backup_events: {
+        Row: {
+          after_data: Json | null
+          backup_batch_id: string | null
+          before_data: Json | null
+          created_at: string
+          entity_type: string
+          id: string
+          operation: string
+          record_id: string
+          restored_at: string | null
+          user_id: string
+        }
+        Insert: {
+          after_data?: Json | null
+          backup_batch_id?: string | null
+          before_data?: Json | null
+          created_at?: string
+          entity_type: string
+          id?: string
+          operation: string
+          record_id: string
+          restored_at?: string | null
+          user_id: string
+        }
+        Update: {
+          after_data?: Json | null
+          backup_batch_id?: string | null
+          before_data?: Json | null
+          created_at?: string
+          entity_type?: string
+          id?: string
+          operation?: string
+          record_id?: string
+          restored_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "backup_events_backup_batch_id_fkey"
+            columns: ["backup_batch_id"]
+            isOneToOne: false
+            referencedRelation: "backup_history"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      backup_history: {
+        Row: {
+          backup_status: string
+          backup_type: string
+          created_at: string
+          duration_ms: number
+          error_message: string | null
+          id: string
+          notes: string | null
+          range_from: string | null
+          range_to: string | null
+          row_count: number
+          scope: string
+          skipped_count: number
+          started_at: string
+          status: string
+          storage_location: string
+          user_id: string
+        }
+        Insert: {
+          backup_status?: string
+          backup_type?: string
+          created_at?: string
+          duration_ms?: number
+          error_message?: string | null
+          id?: string
+          notes?: string | null
+          range_from?: string | null
+          range_to?: string | null
+          row_count?: number
+          scope?: string
+          skipped_count?: number
+          started_at?: string
+          status?: string
+          storage_location?: string
+          user_id: string
+        }
+        Update: {
+          backup_status?: string
+          backup_type?: string
+          created_at?: string
+          duration_ms?: number
+          error_message?: string | null
+          id?: string
+          notes?: string | null
+          range_from?: string | null
+          range_to?: string | null
+          row_count?: number
+          scope?: string
+          skipped_count?: number
+          started_at?: string
+          status?: string
+          storage_location?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      backup_records: {
+        Row: {
+          backed_up_at: string
+          id: string
+          transaction_id: string
+          user_id: string
+        }
+        Insert: {
+          backed_up_at?: string
+          id?: string
+          transaction_id: string
+          user_id: string
+        }
+        Update: {
+          backed_up_at?: string
+          id?: string
+          transaction_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      backup_settings: {
+        Row: {
+          auto_backup: boolean
+          created_at: string
+          entry_map: Json
+          form_action_url: string
+          form_url: string
+          sheet_name: string
+          skip_duplicates: boolean
+          spreadsheet_url: string
+          updated_at: string
+          user_id: string
+          web_app_url: string
+        }
+        Insert: {
+          auto_backup?: boolean
+          created_at?: string
+          entry_map?: Json
+          form_action_url?: string
+          form_url?: string
+          sheet_name?: string
+          skip_duplicates?: boolean
+          spreadsheet_url?: string
+          updated_at?: string
+          user_id: string
+          web_app_url?: string
+        }
+        Update: {
+          auto_backup?: boolean
+          created_at?: string
+          entry_map?: Json
+          form_action_url?: string
+          form_url?: string
+          sheet_name?: string
+          skip_duplicates?: boolean
+          spreadsheet_url?: string
+          updated_at?: string
+          user_id?: string
+          web_app_url?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           address: string | null
@@ -222,6 +389,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      create_full_backup: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -229,6 +397,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      restore_backup_event: { Args: { _event_id: string }; Returns: undefined }
     }
     Enums: {
       account_type: "bank" | "cash" | "ewallet" | "other"
