@@ -232,6 +232,39 @@ export type Database = {
         }
         Relationships: []
       }
+      password_reset_otps: {
+        Row: {
+          attempt: number
+          created_at: string
+          expires_at: string
+          id: string
+          otp_hash: string
+          phone_number: string
+          used: boolean
+          user_id: string
+        }
+        Insert: {
+          attempt?: number
+          created_at?: string
+          expires_at: string
+          id?: string
+          otp_hash: string
+          phone_number: string
+          used?: boolean
+          user_id: string
+        }
+        Update: {
+          attempt?: number
+          created_at?: string
+          expires_at?: string
+          id?: string
+          otp_hash?: string
+          phone_number?: string
+          used?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           address: string | null
